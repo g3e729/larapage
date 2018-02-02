@@ -1,0 +1,10 @@
+.DS_Store
+.env
+app/.DS_Store
+node_modules/
+public/css/
+public/js/
+resources/.DS_Store
+resources/views/.DS_Store
+resources/views/admin/.DS_Store
+vendor/
