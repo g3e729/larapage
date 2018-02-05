@@ -10,7 +10,7 @@ class Page extends Model
 {
     use HasSlug;
     
-    protected $fillable = ['title', 'description', 'parent_id'];
+    protected $fillable = ['title', 'description', 'parent_id', 'page_file'];
 
     protected $dates = ['created_at', 'deleted_at', 'updated_at'];
 
@@ -34,5 +34,21 @@ class Page extends Model
         }
 
         abort(404);
+    }
+
+    /**
+     * Get all of the post's likes.
+     */
+    public function file()
+    {
+        return $this->morphOne(File::class, 'fileable');
+    }
+
+    /**
+     * Get all of the post's likes.
+     */
+    public function keywords()
+    {
+        return $this->morphMany(File::class, 'tagable');
     }
 }

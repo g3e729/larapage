@@ -1,4 +1,8 @@
 {
-    "/js/app.js": "/js/app.js",
-    "/css/app.css": "/css/app.css"
+    "/js/admin.js": "/js/admin.js",
+    "/css/admin.css": "/css/admin.css",
+    "/css/global.css": "/css/global.css",
+    "/js/bootstrap.js": "/js/bootstrap.js",
+    "/css/package/bootstrap.css": "/css/package/bootstrap.css",
+    "/css/package/font-awesome.css": "/css/package/font-awesome.css"
 }

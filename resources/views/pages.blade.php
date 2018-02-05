@@ -1,19 +1,21 @@
 @extends('layouts.app')
 
-@section('title', $page->description)
-
-@section('css')
-    @parent
-@endsection
-
-@section('sidebar')
-    @parent
-
-    <p>This is appended to the master sidebar.</p>
-@endsection
+@section('title', ucwords($page->title))
 
 @section('content')
-  <a href="/">Home</a>
-  <a href="/about-us">About Us</a>
-  <p>{{ $page->description }}</p>
+  <section class="hero hght-mid" style="background: url({{ $page->file->path ?? '' }}) !important;">
+    <div class="hero-container">
+    </div>
+  </section>
+
+  <div class="container">
+    <div class="row">
+
+      <div>
+  		  <h2><span>{{ $page->title }}</span></h2>
+  		  <p>{{ $page->description }}</p>
+  		</div>
+
+    </div>
+  </div>
 @endsection

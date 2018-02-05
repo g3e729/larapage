@@ -18,7 +18,9 @@ class CreatePagesTable extends Migration
             $table->unsignedInteger('parent_id')->default(0);
             $table->string('title');
             $table->string('slug');
-            $table->string('description')->nullable();
+            $table->text('description')->nullable();
+            $table->json('displays')->nullable();
+            $table->string('page_file')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });
