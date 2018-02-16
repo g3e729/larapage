@@ -10,7 +10,7 @@ class PageController extends Controller
 {
     public function index()
     {
-    	return response()->json(Page::all());
+    	return response()->json(Page::with('parent')->get());
     }
 
     public function update(Request $request, Page $page)

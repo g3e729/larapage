@@ -39,6 +39,14 @@ class Page extends Model
     /**
      * Get all of the post's likes.
      */
+    public function parent()
+    {
+        return $this->hasOne(self::class, 'id', 'parent_id');
+    }
+
+    /**
+     * Get all of the post's likes.
+     */
     public function file()
     {
         return $this->morphOne(File::class, 'fileable');

@@ -6,47 +6,56 @@
     </h1>
 
     <div class="content">
+
       <table class="table table-hover table-striped">
         <thead>
         <tr>
-          <td>
+          <td width="25%">
             Parent
             <i class="fa fa-sort"></i>
           </td>
-          <td>
+          <td width="25%">
             Title
             <i class="fa fa-sort"></i>
           </td>
-          <td>
-            Customized Page
+          <td width="10%">
+            Page Design
           </td>
-          <td>
+          <td width="20%">
+            Created At
+          </td>
+          <td width="20%">
             Actions
             <i class="fa fa-sort"></i>
           </td>
         </tr>
         </thead>
 
-        <tbody>
+        <tbody v-if="items.length">
           <tr v-for="(item, index) in items">
-            <td v-bind:class="{'text-muted': !item.parent_id}">{{ item.parent_id || '--' }}</td>
+            <td v-bind:class="{'text-muted': !item.parent_id}">{{ item.parent ? item.parent.title : '--' }}</td>
             <td>{{ item.title }}</td>
-            <td><i class="fa" v-bind:class="{'fa-check': item.page_file, 'fa-times': !item.page_file}"></i></td>
+            <td>{{ item.page_file || 'Default' }}</td>
+            <td>{{ item.created_at }}</td>
             <td>
-              <button class="btn btn-primary">
-                <i class="fa fa-edit" title="Edit" data-toggle="modal" data-target="#myModal" v-on:click="edit = item; edit.index = index"></i>
+              <button class="btn btn-primary" v-on:click="editPage(item, index)">
+                <i class="fa fa-edit" title="Edit"></i>
               </button>
-              <button class="btn btn-danger" v-on:click="deleteItem(item.id)">
+              <button class="btn btn-danger" v-on:click="deleteItem(item, true, index)">
                 <i class="fa fa-trash" title="Delete"></i>
               </button>
             </td>
           </tr>
         </tbody>
+
+        <tbody v-else>
+          No Data
+        </tbody>
       </table>
     </div>
 
     <!-- MODAL -->    
-    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal fade editPage" tabindex="-1" role="dialog">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
@@ -65,9 +74,12 @@
                 </textarea>
               </div>
               <div class="form-group">
-                <label for="formGroupExampleInput2">Custom Page Design</label>
-                <input type="text" class="form-control" id="formGroupExampleInput" placeholder="Enter the custom blade file" v-model="edit.page_file">
+                <label for="formGroupExampleInput2">Keywords</label>
+                <input type="text" class="form-control" id="formGroupExampleInput" placeholder="Enter Keywords">
                 </textarea>
+              </div>
+              <div class="form-group">
+                <button class="btn btn-default" v-on:click="customPage(false)" data-dismiss="modal">Custom Page Design</button>
               </div>
 
           </div>
@@ -79,17 +91,64 @@
       </div>
     </div>
 
+    <!-- MODAL -->    
+    <div class="modal fade deletePage" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title" id="myModalLabel">Delete Confirmation</h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          </div>
+          <div class="modal-body">
+            <p>Are you sure you want to delete page "{{ edit.title }}"?</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-danger" v-on:click="deleteItem(edit)">Yes, delete this page</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL -->    
+    <div class="modal fade customPage" tabindex="-1" role="dialog">
+      <div class="modal-dialog modal-full" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title" id="myModalLabel">Custom Page Design</h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          </div>
+          <div class="modal-body">
+            <div id="editor" style="height: 730px; width: 100%;"></div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-default" v-on:click="renderCustom">View</button>
+            <button class="btn btn-primary">Save</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL -->    
+    <div class="modal fade displayPage" tabindex="-1" role="dialog">
+      <div class="modal-dialog modal-full" role="document">
+        <div class="modal-content">
+          <div class="modal-body">
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </template>
-
-
 
 <script>
   export default {
     data(){
       return {
         items: [],
-        edit: {}
+        edit: {},
+        editor: ''
       }
     },
 
@@ -99,29 +158,64 @@
     },
 
     methods: {
-      fetchItems()
-      {
+      fetchItems() {
         let uri = '/api/v1/pages';
         this.axios.get(uri).then((response) => {
-            this.items = response.data;
+          this.items = response.data;
         });
       },
-      deleteItem(id)
-      {
-        let uri = `/api/v1/pages/${id}`;
-        this.items.splice(id, 1);
-        this.axios.delete(uri);
+      deleteItem(item, show, index) {
+        if (show) {
+          this.edit = item;
+          this.edit.index = index;
+          $('.deletePage').modal('show');
+        } else {
+          let uri = `/api/v1/pages/${this.edit.id}`;
+          this.items.splice(this.edit.index, 1);
+          this.axios.delete(uri);
+        }
       },
-      updatePage()
-      {
+      updatePage() {
         let uri = `/api/v1/pages/${this.edit.id}`;
         this.axios.patch(uri, {
-          data: this.edit
+        data: this.edit
         }).then((response) => {
             if(response) {
               this.items[this.edit.index] = this.edit;
             }
         });
+      },
+      editPage(item, index) {
+        this.edit = item;
+        this.edit.index = index;
+        $('.editPage').modal('show');
+      },
+      customPage(back) {
+        if (!back) {
+          this.editor = Kal.edit("editor");
+          this.editor.setTheme("ace/theme/monokai");
+          this.editor.session.setMode("ace/mode/html");
+          this.editor.setValue(this.edit.title);
+          this.editor.clearSelection();
+        }
+
+        $('.customPage').modal({
+          show: true,
+          backdrop: 'static',
+          keyboard: false
+        });
+      },
+      renderCustom () {
+        $('.customPage').modal('hide');
+
+        var displayPage = $('.displayPage');
+
+        displayPage.modal({
+          show: true,
+          backdrop: 'static',
+        });
+
+        displayPage.find('.modal-body').html(this.editor.getValue());
       }
     }
   }

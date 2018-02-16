@@ -24,7 +24,11 @@ $font_primary_clr: #ffffff;
   align-items: stretch;
   min-height: 100vh;
 
-} // .wrapper
+} 
+
+.modal-full {
+    max-width: 100% !important;
+}
 
 .container-fluid {
   width: 500vh !important;
@@ -45,6 +49,11 @@ $font_primary_clr: #ffffff;
     i {
       font-size: 25px;
       color: $main_clr;
+    }
+
+    a {
+      float: right;
+      font-size: 13px;
     }
   }
 

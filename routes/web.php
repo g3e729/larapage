@@ -23,6 +23,10 @@ Route::get('/admin/{page}', function () {
     return view('admin.index');
 });
 
+Route::get('/admin/{page}/{page2}', function () {
+    return view('admin.index');
+});
+
 Route::group(['namespace'  => 'Admin', 'middleware' => [], 'prefix' => '/api/v1'], function () {
 	Route::resource('pages', 'PageController');
 });
